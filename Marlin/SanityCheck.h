@@ -540,6 +540,7 @@
   /**
    * Check if Probe_Offset * Grid Points is greater than Probing Range
    */
+   /*
   #if ABL_GRID
     #ifndef DELTA_PROBEABLE_RADIUS
       // Be sure points are in the right order
@@ -577,7 +578,7 @@
     #endif
 
   #endif // !ABL_GRID
-
+*/
 #endif // HAS_ABL
 
 /**

@@ -87,7 +87,7 @@
 // startup. Implementation of an idea by Prof Braino to inform user that any changes made to this
 // build by the user have been successfully uploaded into firmware.
 #define STRING_CONFIG_H_AUTHOR "(none, default config)" // Who made the changes.
-#define SHOW_BOOTSCREEN
+//#define SHOW_BOOTSCREEN
 #define STRING_SPLASH_LINE1 SHORT_BUILD_VERSION // will be shown during bootup in line 1
 #define STRING_SPLASH_LINE2 WEBSITE_URL         // will be shown during bootup in line 2
 
@@ -791,9 +791,9 @@
   #define ABL_GRID_POINTS_Y ABL_GRID_POINTS_X
 
   // Set the boundaries for probing (where the probe can reach).
-  #define LEFT_PROBE_BED_POSITION -13.5
+  #define LEFT_PROBE_BED_POSITION 0
   #define RIGHT_PROBE_BED_POSITION 142.5
-  #define FRONT_PROBE_BED_POSITION -2.8
+  #define FRONT_PROBE_BED_POSITION 0
   #define BACK_PROBE_BED_POSITION 158.2
 
   // The Z probe minimum outer margin (to validate G29 parameters).

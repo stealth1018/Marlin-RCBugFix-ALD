@@ -692,16 +692,16 @@
 
   #if IS_KINEMATIC
     // Check for this in the code instead
-    #define MIN_PROBE_X X_MIN_POS
-    #define MAX_PROBE_X X_MAX_POS
-    #define MIN_PROBE_Y Y_MIN_POS
-    #define MAX_PROBE_Y Y_MAX_POS
+    #define MIN_PROBE_X X_MIN_POS-100
+    #define MAX_PROBE_X X_MAX_POS+100
+    #define MIN_PROBE_Y Y_MIN_POS-100
+    #define MAX_PROBE_Y Y_MAX_POS+100
   #else
     // Boundaries for probing based on set limits
-    #define MIN_PROBE_X (max(X_MIN_POS, X_MIN_POS + X_PROBE_OFFSET_FROM_EXTRUDER))
-    #define MAX_PROBE_X (min(X_MAX_POS, X_MAX_POS + X_PROBE_OFFSET_FROM_EXTRUDER))
-    #define MIN_PROBE_Y (max(Y_MIN_POS, Y_MIN_POS + Y_PROBE_OFFSET_FROM_EXTRUDER))
-    #define MAX_PROBE_Y (min(Y_MAX_POS, Y_MAX_POS + Y_PROBE_OFFSET_FROM_EXTRUDER))
+    #define MIN_PROBE_X X_MIN_POS-100
+    #define MAX_PROBE_X X_MAX_POS+100
+    #define MIN_PROBE_Y Y_MIN_POS-100
+    #define MAX_PROBE_Y Y_MAX_POS+100
   #endif
 
   // Stepper pulse duration, in cycles
