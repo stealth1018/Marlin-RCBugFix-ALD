@@ -203,10 +203,10 @@
     #define NEWPANEL  //enable this if you have a click-encoder panel
     #define ULTRA_LCD
     #ifndef LCD_WIDTH
-      #define LCD_WIDTH 20
+      #define LCD_WIDTH 16
     #endif
     #ifndef LCD_HEIGHT
-      #define LCD_HEIGHT 4
+      #define LCD_HEIGHT 2
     #endif
   #else //no panel but just LCD
     #if ENABLED(ULTRA_LCD)
