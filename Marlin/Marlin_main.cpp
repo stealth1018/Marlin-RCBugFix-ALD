@@ -3283,6 +3283,8 @@ inline void gcode_G4() {
  */
 inline void gcode_G28() {
 
+  do_blocking_move_to_z(current_position[Z_AXIS]+Z_CLEARANCE_DEPLOY_PROBE);
+
   #if ENABLED(DEBUG_LEVELING_FEATURE)
     if (DEBUGGING(LEVELING)) {
       SERIAL_ECHOLNPGM(">>> gcode_G28");
@@ -3752,6 +3754,10 @@ inline void gcode_G28() {
    */
   inline void gcode_G29() {
 
+    gcode_G28();
+
+    gcode_M48();
+    
     #if ENABLED(DEBUG_LEVELING_FEATURE)
       bool query = code_seen('Q');
       uint8_t old_debug_flags = marlin_debug_flags;
