@@ -643,7 +643,7 @@
  * Example: `M851 Z-5` with a CLEARANCE of 4  =>  9mm from bed to nozzle.
  *     But: `M851 Z+1` with a CLEARANCE of 2  =>  2mm from bed to nozzle.
  */
-#define Z_CLEARANCE_DEPLOY_PROBE   5 // Z Clearance for Deploy/Stow
+#define Z_CLEARANCE_DEPLOY_PROBE   8 // Z Clearance for Deploy/Stow
 #define Z_CLEARANCE_BETWEEN_PROBES  2 // Z Clearance between probe points
 
 //
@@ -699,7 +699,7 @@
 #define Y_HOME_DIR 1
 #define Z_HOME_DIR -1
 
-#define min_software_endstops true // If true, axis won't move to coordinates less than HOME_POS.
+#define min_software_endstops false // If true, axis won't move to coordinates less than HOME_POS.
 #define max_software_endstops true  // If true, axis won't move to coordinates greater than the defined lengths below.
 
 // @section machine
@@ -819,7 +819,7 @@
  * Commands to execute at the end of G29 probing.
  * Useful to retract or move the Z probe out of the way.
  */
-//#define Z_PROBE_END_SCRIPT "G1 Z10 F12000\nG1 X15 Y330\nG1 Z0.5\nG1 Z10"
+#define Z_PROBE_END_SCRIPT "G1 Y168.5 F8000\nG1 X80 F8000\nG1 Z-1 F600\nG1 Z0.2\n"
 
 
 // @section homing

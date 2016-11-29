@@ -1820,9 +1820,27 @@ static void clean_up_after_endstop_or_probe_move() {
         SERIAL_EOL;
       }
     #endif
-
+    /*
     // Dock sled a bit closer to ensure proper capturing
     do_blocking_move_to_x(X_MAX_POS + SLED_DOCKING_OFFSET - ((stow) ? 1 : 0));
+    */
+
+    //engage probe
+      //float lastpos = current_position[X_AXIS];
+
+      while(READ(Z_MIN_PIN)){
+        HOMEAXIS(X);
+        endstops.enable(false);
+        do_blocking_move_to_x(current_position[X_AXIS]-4);
+        delay(500);
+        endstops.enable(true);        
+      }
+      //HOMEAXIS(X);
+      endstops.enable(true);
+      endstops.enable_z_probe(true);
+      endstops.hit_on_purpose();
+      //do_blocking_move_to(lastpos, current_position[Y_AXIS], current_position[Z_AXIS]);
+    //
 
     #if PIN_EXISTS(SLED)
       digitalWrite(SLED_PIN, !stow); // switch solenoid
