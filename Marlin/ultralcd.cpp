@@ -60,6 +60,8 @@ char lcd_status_message[3 * (LCD_WIDTH) + 1] = WELCOME_MSG; // worst case is kan
 
 // The main status screen
 void lcd_status_screen();
+void probe_set();
+void probe_check();
 
 millis_t next_lcd_update_ms;
 
@@ -206,13 +208,13 @@ uint8_t lcdDrawUpdate = LCDVIEW_CLEAR_CALL_REDRAW; // Set when the LCD needs to 
   /* Helper macros for menus */
 
   #ifndef ENCODER_FEEDRATE_DEADZONE
-    #define ENCODER_FEEDRATE_DEADZONE 10
+    #define ENCODER_FEEDRATE_DEADZONE 0
   #endif
   #ifndef ENCODER_STEPS_PER_MENU_ITEM
-    #define ENCODER_STEPS_PER_MENU_ITEM 5
+    #define ENCODER_STEPS_PER_MENU_ITEM 1
   #endif
   #ifndef ENCODER_PULSES_PER_STEP
-    #define ENCODER_PULSES_PER_STEP 1
+    #define ENCODER_PULSES_PER_STEP 4
   #endif
 
   /**
@@ -1377,6 +1379,41 @@ void kill_screen(const char* lcd_msg) {
    * "Prepare" > "Move Axis" submenu
    *
    */
+  void probe_check() {
+    enqueue_and_echo_commands_P(PSTR("G28 XY"));    
+    enqueue_and_echo_commands_P(PSTR("G30 X71 Y10"));
+    enqueue_and_echo_commands_P(PSTR("G1 X71 Y10 Z0 F8000"));
+  }
+  void probe_set() {
+    if (lcd_clicked) {
+      do_blocking_move_to_z(current_position[Z_AXIS]+1);
+      Config_StoreSettings(); 
+      return lcd_goto_previous_menu(); 
+    }
+
+    ENCODER_DIRECTION_NORMAL();
+    if (encoderPosition) {
+      refresh_cmd_timeout();
+
+      // Limit to software endstops, if enabled
+      float min = Z_PROBE_OFFSET_RANGE_MIN,
+            max = Z_PROBE_OFFSET_RANGE_MAX;
+
+      // Get the new position
+      current_position[Z_AXIS] += float((int32_t)encoderPosition) * 0.05;
+      zprobe_zoffset += float((int32_t)encoderPosition) * 0.05;
+
+      // Limit only when trying to move towards the limit
+      if ((int32_t)encoderPosition < 0) NOLESS(zprobe_zoffset, min);
+      if ((int32_t)encoderPosition > 0) NOMORE(zprobe_zoffset, max);
+
+      manual_move_to_current(Z_AXIS);
+
+      encoderPosition = 0;
+      lcdDrawUpdate = LCDVIEW_REDRAW_NOW;
+    }
+    if (lcdDrawUpdate) lcd_implementation_drawedit(PSTR("Z Offset"), ftostr32(zprobe_zoffset));
+  }
 
   void _lcd_move_xyz(const char* name, AxisEnum axis) {
     if (lcd_clicked) { return lcd_goto_previous_menu(); }
@@ -1550,6 +1587,9 @@ void kill_screen(const char* lcd_msg) {
   void lcd_control_menu() {
     START_MENU();
     MENU_BACK(MSG_MAIN);
+    
+    MENU_ITEM(function, "Probe Check", probe_check);
+    MENU_ITEM(submenu, "Z Offset", probe_set);
     MENU_ITEM(submenu, MSG_TEMPERATURE, lcd_control_temperature_menu);
     MENU_ITEM(submenu, MSG_MOTION, lcd_control_motion_menu);
     MENU_ITEM(submenu, MSG_VOLUMETRIC, lcd_control_volumetric_menu);

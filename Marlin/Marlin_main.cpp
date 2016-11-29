@@ -4320,16 +4320,18 @@ inline void gcode_G28() {
     #endif
 
     setup_for_endstop_or_probe_move();
-
-    float measured_z = probe_pt(X_probe_location, Y_probe_location, stow, 1);
-
+    
+    //float measured_z = probe_pt(X_probe_location, Y_probe_location, stow, 1);
+    do_blocking_move_to_xy(X_probe_location-X_PROBE_OFFSET_FROM_EXTRUDER, Y_probe_location-Y_PROBE_OFFSET_FROM_EXTRUDER);
+    HOMEAXIS(Z);
+/*
     SERIAL_PROTOCOLPGM("Bed X: ");
     SERIAL_PROTOCOL(X_probe_location + 0.0001);
     SERIAL_PROTOCOLPGM(" Y: ");
     SERIAL_PROTOCOL(Y_probe_location + 0.0001);
     SERIAL_PROTOCOLPGM(" Z: ");
     SERIAL_PROTOCOLLN(measured_z + 0.0001);
-
+*/
     clean_up_after_endstop_or_probe_move();
 
     report_current_position();
