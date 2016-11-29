@@ -298,6 +298,7 @@
 
 bool Running = true;
 bool Zrepeat = true;
+bool Zsensor = true;
 
 uint8_t marlin_debug_flags = DEBUG_NONE;
 
@@ -1828,14 +1829,24 @@ static void clean_up_after_endstop_or_probe_move() {
     //engage probe
       //float lastpos = current_position[X_AXIS];
 
+      int a=0;
       while(READ(Z_MIN_PIN)){
+        a++;
         HOMEAXIS(X);
         endstops.enable(false);
         do_blocking_move_to_x(current_position[X_AXIS]-4);
         delay(500);
-        endstops.enable(true);        
+        endstops.enable(true); 
+
+        if(a==3){
+          Zsensor = false;
+          SERIAL_ERROR_START;
+          SERIAL_ERRORLNPGM("Zprobe ERR");
+          LCD_MESSAGEPGM("Zprobe ERR");
+          break;
+        }       
       }
-      //HOMEAXIS(X);
+      
       endstops.enable(true);
       endstops.enable_z_probe(true);
       endstops.hit_on_purpose();
@@ -2539,14 +2550,16 @@ static void homeaxis(AxisEnum axis) {
     home_dir(axis);
 
   // Homing Z towards the bed? Deploy the Z probe or endstop.
+  Zsensor = true;
   #if HOMING_Z_WITH_PROBE
     if (axis == Z_AXIS && DEPLOY_PROBE()) return;
   #endif
+  if(!Zsensor) return;
 
-  // Set a flag for Z motor locking
+  // Set a flag for Z motor locking  
   #if ENABLED(Z_DUAL_ENDSTOPS)
     if (axis == Z_AXIS) stepper.set_homing_flag(true);
-  #endif
+  #endif 
 
   // Fast move towards endstop until triggered
   #if ENABLED(DEBUG_LEVELING_FEATURE)
@@ -3454,6 +3467,7 @@ inline void gcode_G28() {
         #else
           HOMEAXIS(Z);
         #endif
+        if(!Zsensor) return;
         #if ENABLED(DEBUG_LEVELING_FEATURE)
           if (DEBUGGING(LEVELING)) DEBUG_POS("> (home_all_axis || homeZ) > final", current_position);
         #endif
@@ -3774,6 +3788,7 @@ inline void gcode_G28() {
   inline void gcode_G29() {
 
     gcode_G28();
+    if(!Zsensor) return;
     gcode_M48();
     if(!Zrepeat) return;
 
@@ -5064,6 +5079,7 @@ inline void gcode_M42() {
 
     report_current_position();
 
+    Zrepeat = true;
     if(max-min>0.01) {
       Zrepeat = false;
       SERIAL_ERROR_START;
