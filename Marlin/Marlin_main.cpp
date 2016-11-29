@@ -297,6 +297,7 @@
 #endif
 
 bool Running = true;
+bool Zrepeat = true;
 
 uint8_t marlin_debug_flags = DEBUG_NONE;
 
@@ -3755,9 +3756,9 @@ inline void gcode_G28() {
   inline void gcode_G29() {
 
     gcode_G28();
-
     gcode_M48();
-    
+    if(!Zrepeat) return;
+
     #if ENABLED(DEBUG_LEVELING_FEATURE)
       bool query = code_seen('Q');
       uint8_t old_debug_flags = marlin_debug_flags;
@@ -5044,6 +5045,13 @@ inline void gcode_M42() {
     clean_up_after_endstop_or_probe_move();
 
     report_current_position();
+
+    if(max-min>0.01) {
+      Zrepeat = false;
+      SERIAL_ERROR_START;
+      SERIAL_ERRORLNPGM("Zstop repeat ERR");
+      LCD_MESSAGEPGM("Zstop repeat ERR");
+    }      
   }
 
 #endif // Z_MIN_PROBE_REPEATABILITY_TEST
