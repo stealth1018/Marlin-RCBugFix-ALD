@@ -4087,6 +4087,15 @@ inline void gcode_G28() {
     
     do_blocking_move_to(80,168.5,-1);
     do_blocking_move_to_z(0.2);
+    /*
+    enqueue_and_echo_commands_P("G92 E0 \n G1 E40 F")
+    do_blocking_move_to_xy(80,162);
+    do_blocking_move_to_xy(80,168.5);
+    do_blocking_move_to_xy(80,162);
+    do_blocking_move_to_xy(80,168.5);
+    do_blocking_move_to_xy(80,162);
+    do_blocking_move_to_xy(80,168.5);
+    */     
     stepper.synchronize();
 
     //

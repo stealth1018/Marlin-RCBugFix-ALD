@@ -280,7 +280,7 @@
   #define MSG_STORE_EPROM                     "Store memory"
 #endif
 #ifndef MSG_LOAD_EPROM
-  #define MSG_LOAD_EPROM                      "Load memory"
+  #define MSG_LOAD_EPROM                      "Reset memory"
 #endif
 #ifndef MSG_RESTORE_FAILSAFE
   #define MSG_RESTORE_FAILSAFE                "Restore failsafe"
