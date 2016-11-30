@@ -62,10 +62,10 @@ char lcd_status_message[3 * (LCD_WIDTH) + 1] = WELCOME_MSG; // worst case is kan
 void lcd_status_screen();
 void probe_set();
 void probe_check();
-static void bed_down()
+void bed_down()
 {    
     do_blocking_move_to_z(current_position[Z_AXIS]+10);
-    enqueue_and_echo_commands_P(PSTR("M84"));      
+    stepper.finish_and_disable();      
 }
 
 millis_t next_lcd_update_ms;
@@ -609,6 +609,7 @@ void kill_screen(const char* lcd_msg) {
     #endif
 
     if (planner.movesplanned() || IS_SD_PRINTING) {
+      MENU_ITEM(submenu, MSG_BABYSTEP_Z, lcd_babystep_z);
       MENU_ITEM(submenu, MSG_TUNE, lcd_tune_menu);
     }
     else {
@@ -1236,10 +1237,10 @@ void kill_screen(const char* lcd_msg) {
     // ^ Main
     //
     MENU_BACK(MSG_MAIN);
-    MENU_ITEM(function, "BED DOWN", bed_down);
+    MENU_ITEM(gcode, "Motor OFF", PSTR("M84"));
     MENU_ITEM(function, MSG_PREHEAT_2, lcd_preheat_abs0);
     MENU_ITEM(function, MSG_PREHEAT_1, lcd_preheat_pla0);
-    MENU_ITEM(gcode, "Loading filament", PSTR("G92 E0\nG1 E50 F150"));
+    MENU_ITEM(gcode, "Loading filament", PSTR("M84\nG92 E0\nG1 E50 F150"));
     MENU_ITEM(gcode, "Auto Level", PSTR("G29"));
     MENU_ITEM(function, MSG_COOLDOWN, lcd_cooldown);
 /*  
@@ -1891,6 +1892,10 @@ void kill_screen(const char* lcd_msg) {
     MENU_ITEM_EDIT(float3, MSG_VMAX MSG_Y, &planner.max_feedrate_mm_s[Y_AXIS], 1, 999);
     MENU_ITEM_EDIT(float3, MSG_VMAX MSG_Z, &planner.max_feedrate_mm_s[Z_AXIS], 1, 999);
     MENU_ITEM_EDIT(float3, MSG_VMAX MSG_E, &planner.max_feedrate_mm_s[E_AXIS], 1, 999);
+    MENU_ITEM_EDIT_CALLBACK(long5, MSG_AMAX MSG_X, &planner.max_acceleration_mm_per_s2[X_AXIS], 100, 99000, _reset_acceleration_rates);
+    MENU_ITEM_EDIT_CALLBACK(long5, MSG_AMAX MSG_Y, &planner.max_acceleration_mm_per_s2[Y_AXIS], 100, 99000, _reset_acceleration_rates);
+    MENU_ITEM_EDIT_CALLBACK(long5, MSG_AMAX MSG_Z, &planner.max_acceleration_mm_per_s2[Z_AXIS], 10, 99000, _reset_acceleration_rates);
+    MENU_ITEM_EDIT_CALLBACK(long5, MSG_AMAX MSG_E, &planner.max_acceleration_mm_per_s2[E_AXIS], 100, 99000, _reset_acceleration_rates);
     //MENU_ITEM_EDIT(long5, "DIGIPOT X", &stepper.digipot_motor_current[0],0,255);
     /*
     #if HAS_BED_PROBE
