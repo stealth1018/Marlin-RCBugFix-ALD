@@ -1238,7 +1238,7 @@ void kill_screen(const char* lcd_msg) {
     // ^ Main
     //
     MENU_BACK(MSG_MAIN);
-    MENU_ITEM(gcode, "Motor OFF", PSTR("M84"));
+    MENU_ITEM(gcode, "Bed Down", PSTR("G91 \n G1 Z3 \n G90 \n M84"));
     MENU_ITEM(function, MSG_PREHEAT_2, lcd_preheat_abs0);
     MENU_ITEM(function, MSG_PREHEAT_1, lcd_preheat_pla0);
     MENU_ITEM(gcode, "Loading filament", PSTR("M84\nG92 E0\nG1 E50 F150"));
@@ -1399,7 +1399,7 @@ void kill_screen(const char* lcd_msg) {
   }
   void probe_set() {
     if (lcd_clicked) {
-      do_blocking_move_to_z(current_position[Z_AXIS]+1);
+      enqueue_and_echo_commands_P(PSTR("G91 \n G1 Z3 \n G90"));    
       Config_StoreSettings(); 
       return lcd_goto_previous_menu(); 
     }
