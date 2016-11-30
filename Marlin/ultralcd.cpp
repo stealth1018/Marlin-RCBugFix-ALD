@@ -578,7 +578,7 @@ void kill_screen(const char* lcd_msg) {
         thermalManager.autotempShutdown();
       #endif
       wait_for_heatup = false;
-      lcd_setstatus(MSG_PRINT_ABORTED, true);
+      //lcd_setstatus(MSG_PRINT_ABORTED, true);
     }
 
   #endif //SDSUPPORT

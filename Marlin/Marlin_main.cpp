@@ -3788,9 +3788,15 @@ inline void gcode_G28() {
   inline void gcode_G29() {
 
     gcode_G28();
-    if(!Zsensor) return;
+    if(!Zsensor){
+      lcd_sdcard_stop();
+      return;
+    } 
     gcode_M48();
-    if(!Zrepeat) return;
+    if(!Zrepeat){
+      lcd_sdcard_stop();
+      return;
+    } 
 
     #if ENABLED(DEBUG_LEVELING_FEATURE)
       bool query = code_seen('Q');
@@ -4078,6 +4084,11 @@ inline void gcode_G28() {
       return;
     }
 
+    
+    do_blocking_move_to(80,168.5,-1);
+    do_blocking_move_to_z(0.2);
+    stepper.synchronize();
+
     //
     // Unless this is a dry run, auto bed leveling will
     // definitely be enabled after this point
@@ -4269,7 +4280,7 @@ inline void gcode_G28() {
       }
 
     #endif // ABL_PLANAR
-
+/*
     #ifdef Z_PROBE_END_SCRIPT
       #if ENABLED(DEBUG_LEVELING_FEATURE)
         if (DEBUGGING(LEVELING)) SERIAL_ECHOLNPAIR("Z Probe End Script: ", Z_PROBE_END_SCRIPT);
@@ -4277,7 +4288,7 @@ inline void gcode_G28() {
       enqueue_and_echo_commands_P(PSTR(Z_PROBE_END_SCRIPT));
       stepper.synchronize();
     #endif
-
+*/
     #if ENABLED(DEBUG_LEVELING_FEATURE)
       if (DEBUGGING(LEVELING)) SERIAL_ECHOLNPGM("<<< gcode_G29");
     #endif
@@ -4874,7 +4885,7 @@ inline void gcode_M42() {
     if (verbose_level > 0)
       SERIAL_PROTOCOLLNPGM("M48 Z-Probe Repeatability Test");
 
-    int8_t n_samples = code_seen('P') ? code_value_byte() : 10;
+    int8_t n_samples = code_seen('P') ? code_value_byte() : 5;
     if (n_samples < 4 || n_samples > 50) {
       SERIAL_PROTOCOLLNPGM("?Sample size not plausible (4-50).");
       return;
@@ -5082,7 +5093,7 @@ inline void gcode_M42() {
     report_current_position();
 
     Zrepeat = true;
-    if(max-min>0.01) {
+    if(max-min>0.015) {
       Zrepeat = false;
       SERIAL_ERROR_START;
       SERIAL_ERRORLNPGM("Zstop repeat ERR");

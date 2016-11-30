@@ -43,6 +43,7 @@
   void lcd_reset_alert_level();
   void lcd_kill_screen();
   void kill_screen(const char* lcd_msg);
+  void lcd_sdcard_stop();
 
   #if (ENABLED(LCD_I2C_TYPE_MCP23017) || ENABLED(LCD_I2C_TYPE_MCP23008)) && ENABLED(DETECT_DEVICE)
     bool lcd_detected();
@@ -164,6 +165,8 @@
 
   #define LCD_MESSAGEPGM(x) NOOP
   #define LCD_ALERTMESSAGEPGM(x) NOOP
+
+
 
 #endif // ULTRA_LCD
 
