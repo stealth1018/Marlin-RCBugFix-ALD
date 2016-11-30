@@ -62,6 +62,7 @@ char lcd_status_message[3 * (LCD_WIDTH) + 1] = WELCOME_MSG; // worst case is kan
 void lcd_status_screen();
 void probe_set();
 void probe_check();
+void lcd_babystep_z();
 void bed_down()
 {    
     do_blocking_move_to_z(current_position[Z_AXIS]+10);
