@@ -660,6 +660,7 @@ void Planner::_buffer_line(const float &a, const float &b, const float &c, const
         de = 0; // no difference
         SERIAL_ECHO_START;
         SERIAL_ECHOLNPGM(MSG_ERR_COLD_EXTRUDE_STOP);
+        LCD_MESSAGEPGM(MSG_ERR_COLD_EXTRUDE_STOP);
       }
       #if ENABLED(PREVENT_LENGTHY_EXTRUDE)
         if (labs(de) > (int32_t)axis_steps_per_mm[E_AXIS] * (EXTRUDE_MAXLENGTH)) { // It's not important to get max. extrusion length in a precision < 1mm, so save some cycles and cast to int

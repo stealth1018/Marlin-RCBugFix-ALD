@@ -62,6 +62,11 @@ char lcd_status_message[3 * (LCD_WIDTH) + 1] = WELCOME_MSG; // worst case is kan
 void lcd_status_screen();
 void probe_set();
 void probe_check();
+static void bed_down()
+{    
+    do_blocking_move_to_z(current_position[Z_AXIS]+10);
+    enqueue_and_echo_commands_P(PSTR("M84"));      
+}
 
 millis_t next_lcd_update_ms;
 
@@ -751,7 +756,7 @@ void kill_screen(const char* lcd_msg) {
     // ^ Main
     //
     MENU_BACK(MSG_MAIN);
-
+    MENU_ITEM(submenu, MSG_BABYSTEP_Z, lcd_babystep_z);
     //
     // Speed:
     //
@@ -836,7 +841,7 @@ void kill_screen(const char* lcd_msg) {
         #endif //EXTRUDERS > 3
       #endif //EXTRUDERS > 2
     #endif //EXTRUDERS > 1
-
+/*
     //
     // Babystep X:
     // Babystep Y:
@@ -849,7 +854,7 @@ void kill_screen(const char* lcd_msg) {
       #endif //BABYSTEP_XY
       MENU_ITEM(submenu, MSG_BABYSTEP_Z, lcd_babystep_z);
     #endif
-
+*/
     //
     // Change filament
     //
@@ -1231,7 +1236,13 @@ void kill_screen(const char* lcd_msg) {
     // ^ Main
     //
     MENU_BACK(MSG_MAIN);
-
+    MENU_ITEM(function, "BED DOWN", bed_down);
+    MENU_ITEM(function, MSG_PREHEAT_2, lcd_preheat_abs0);
+    MENU_ITEM(function, MSG_PREHEAT_1, lcd_preheat_pla0);
+    MENU_ITEM(gcode, "Loading filament", PSTR("G92 E0\nG1 E50 F150"));
+    MENU_ITEM(gcode, "Auto Level", PSTR("G29"));
+    MENU_ITEM(function, MSG_COOLDOWN, lcd_cooldown);
+/*  
     //
     // Auto Home
     //
@@ -1313,7 +1324,7 @@ void kill_screen(const char* lcd_msg) {
     #if ENABLED(SDSUPPORT) && ENABLED(MENU_ADDAUTOSTART)
       MENU_ITEM(function, MSG_AUTOSTART, lcd_autostart_sd);
     #endif
-
+*/
     END_MENU();
   }
 
@@ -1587,7 +1598,12 @@ void kill_screen(const char* lcd_msg) {
   void lcd_control_menu() {
     START_MENU();
     MENU_BACK(MSG_MAIN);
-    
+    MENU_ITEM(function, "Probe Check", probe_check);
+    MENU_ITEM(submenu, "Z Offset", probe_set);
+    MENU_ITEM(submenu, MSG_TEMPERATURE, lcd_control_temperature_menu);
+    MENU_ITEM(submenu, MSG_MOTION, lcd_control_motion_menu);
+
+/*    
     MENU_ITEM(function, "Probe Check", probe_check);
     MENU_ITEM(submenu, "Z Offset", probe_set);
     MENU_ITEM(submenu, MSG_TEMPERATURE, lcd_control_temperature_menu);
@@ -1610,6 +1626,7 @@ void kill_screen(const char* lcd_msg) {
       MENU_ITEM(function, MSG_LOAD_EPROM, Config_RetrieveSettings);
     #endif
     MENU_ITEM(function, MSG_RESTORE_FAILSAFE, Config_ResetDefault);
+*/
     END_MENU();
   }
 
@@ -1705,6 +1722,17 @@ void kill_screen(const char* lcd_msg) {
     MENU_BACK(MSG_CONTROL);
 
     //
+    // Preheat PLA conf
+    //
+    MENU_ITEM(submenu, MSG_PREHEAT_1_SETTINGS, lcd_control_temperature_preheat_pla_settings_menu);
+
+    //
+    // Preheat ABS conf
+    //
+    MENU_ITEM(submenu, MSG_PREHEAT_2_SETTINGS, lcd_control_temperature_preheat_abs_settings_menu);
+ 
+
+    //
     // Nozzle:
     // Nozzle [1-4]:
     //
@@ -1757,7 +1785,7 @@ void kill_screen(const char* lcd_msg) {
         MENU_MULTIPLIER_ITEM_EDIT(int3, MSG_FAN_SPEED " 3", &fanSpeeds[2], 0, 255);
       #endif
     #endif // FAN_COUNT > 0
-
+/*
     //
     // Autotemp, Min, Max, Fact
     //
@@ -1814,17 +1842,8 @@ void kill_screen(const char* lcd_msg) {
       #endif //!PID_PARAMS_PER_HOTEND || HOTENDS == 1
 
     #endif //PIDTEMP
-
-    //
-    // Preheat PLA conf
-    //
-    MENU_ITEM(submenu, MSG_PREHEAT_1_SETTINGS, lcd_control_temperature_preheat_pla_settings_menu);
-
-    //
-    // Preheat ABS conf
-    //
-    MENU_ITEM(submenu, MSG_PREHEAT_2_SETTINGS, lcd_control_temperature_preheat_abs_settings_menu);
-    END_MENU();
+*/
+   END_MENU();
   }
 
   void _lcd_control_temperature_preheat_settings_menu(uint8_t material) {
@@ -1868,6 +1887,12 @@ void kill_screen(const char* lcd_msg) {
   void lcd_control_motion_menu() {
     START_MENU();
     MENU_BACK(MSG_CONTROL);
+    MENU_ITEM_EDIT(float3, MSG_VMAX MSG_X, &planner.max_feedrate_mm_s[X_AXIS], 1, 999);
+    MENU_ITEM_EDIT(float3, MSG_VMAX MSG_Y, &planner.max_feedrate_mm_s[Y_AXIS], 1, 999);
+    MENU_ITEM_EDIT(float3, MSG_VMAX MSG_Z, &planner.max_feedrate_mm_s[Z_AXIS], 1, 999);
+    MENU_ITEM_EDIT(float3, MSG_VMAX MSG_E, &planner.max_feedrate_mm_s[E_AXIS], 1, 999);
+    //MENU_ITEM_EDIT(long5, "DIGIPOT X", &stepper.digipot_motor_current[0],0,255);
+    /*
     #if HAS_BED_PROBE
       MENU_ITEM_EDIT(float32, MSG_ZPROBE_ZOFFSET, &zprobe_zoffset, Z_PROBE_OFFSET_RANGE_MIN, Z_PROBE_OFFSET_RANGE_MAX);
     #endif
@@ -1903,6 +1928,7 @@ void kill_screen(const char* lcd_msg) {
     #if ENABLED(ABORT_ON_ENDSTOP_HIT_FEATURE_ENABLED)
       MENU_ITEM_EDIT(bool, MSG_ENDSTOP_ABORT, &stepper.abort_on_endstop_hit);
     #endif
+    */
     END_MENU();
   }
 
